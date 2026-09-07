@@ -1,0 +1,6 @@
+/nala
+/nala.exe
+/coverage.out
+.agents/config.md
+.env
+session.json
