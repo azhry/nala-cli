@@ -1,7 +1,7 @@
 # Nala Labs API contract consumed by this CLI
 
 The authoritative server-side contract is maintained in the Nala Labs
-repository at `backend/.agents/knowledge/api-contracts.md`. The CLI consumes:
+repository at `.agents/knowledge/api-contracts.md`. The CLI consumes:
 
 | Method | Endpoint | Purpose |
 | --- | --- | --- |

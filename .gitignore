@@ -4,3 +4,6 @@
 .agents/config.md
 .env
 session.json
+.agents/.env
+__pycache__/
+*.py[cod]
