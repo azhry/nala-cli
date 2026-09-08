@@ -24,20 +24,13 @@ Before writing or updating manual evidence in a task or pull request:
 - Never put a fabricated or placeholder positive target in the acceptance flow: no `id 0`, `example.invalid`, invented app name, or hard-coded positive ID. Derive positive app and deployment IDs from the real fixture response. If a negative validation check is useful, label it regression-only and do not present it as live acceptance.
 - “A reviewer must run this” is a handoff condition, not completion. When the current agent has the documented boundary and authorization, execute the required live flow itself; otherwise record the exact unavailable service, dependency, account, or fixture.
 - Treat an accepted `queued` request as request-level evidence only. End-to-end live acceptance requires the documented terminal event/state. An interrupted follow, wrapper timeout, missing terminal event, or nonzero target status is `fail` or an explicit limitation, never a pass.
-- Do not update verification-related tracker/PR state—including pass, acceptance, completion, or ready-for-review markers—until every required target has an evidence-ledger entry and, when required, the fresh-context verifier ledger has been returned and checked. Before then, record only an explicit blocker or limitation; never mark unrun work passed.
+- Do not update verification-related tracker/PR state—including pass, acceptance, completion, or ready-for-review markers—until the fresh verifier has returned its report. Before then, record only an explicit blocker or limitation; never mark unrun work passed.
 
 For live flows that cross services or mutate external state, use the independent-verifier protocol below. When an isolated subagent facility and a safe documented account/task-owned fixture are available, delegation is a required gate before reporting live acceptance; if either is unavailable, record the exact blocker.
 
-## Role-separated execution
+## Independent verifier
 
-Use four explicit phases for high-risk live acceptance:
-
-1. **Main preparation:** read the task/PR, repository rules, knowledge, and manual contract; resolve the documented environment; create or identify a task-owned fixture; and prepare the exact commands. Do not publish observed results or completion state during this phase.
-2. **Fresh verifier execution:** spawn an isolated verifier with the task/PR reference and repository paths, but no raw credentials, cookies, tokens, or opaque IDs. The verifier independently reads the rules and skill, derives its own positive IDs from its task-owned fixture, runs the exact Bash blocks, and returns only the structured evidence ledger. All live mutations and cleanup must be limited to resources created for that verification run; it must not edit code, tracker/PR text, or existing user-owned applications.
-3. **Main validation:** verify that every required target has a ledger row containing the exact command, immediate status, sanitized response, expected outcome, classification, environment/fixture, and limitation. Reject missing rows, wrapper-only statuses, placeholders, non-terminal queued results, unrun steps, and unverified cleanup.
-4. **Publication:** only after the ledger passes validation may the main agent update Linear/GitHub, change review state, or claim completion. Preserve every fail and limitation; do not rewrite it as reviewer work.
-
-If no isolated verifier or safe task-owned fixture exists, record that exact blocker and use the same ledger in the current context. This phase gate applies regardless of model, context window, or reasoning setting: xhigh adds thinking budget but is not an execution or publication control.
+For high-risk live acceptance, the main agent must spawn one fresh-context verifier and wait for its report. Give it the task/PR reference and repository paths, but no raw credentials, cookies, tokens, or opaque IDs. The verifier independently reads the rules and skill, runs the complete manual contract, derives positive IDs from its own task-owned fixture, limits mutations and cleanup to that fixture, and returns the required evidence fields. It must not edit code, tracker/PR text, or existing user-owned applications. If no isolated verifier or safe task-owned fixture exists, record the exact blocker and use the same contract in the current context. This rule applies regardless of model or reasoning setting; xhigh is not execution proof.
 
 ## Audit-derived readiness checks
 
@@ -56,11 +49,5 @@ When the task includes a tracker or pull-request readiness artifact, apply these
 - Unit tests, local fixtures, stub servers, and protocol checks are regression evidence only; they do not prove live API or authentication behavior.
 - If the live boundary was not run, say so explicitly and name the unavailable dependency or required human action. Do not call an unrun live flow passed.
 - Preserve the repository's documented run commands and environment names. Do not silently substitute ports, accounts, providers, or fixtures.
-
-## Independent verifier protocol
-
-For deploy, monitor, delete, or other destructive/cross-service acceptance, a fresh-context verifier is required when an isolated subagent facility and a safe documented account/task-owned fixture are available. It must read the current task/PR, `AGENTS.md`, the relevant knowledge, and this skill itself; run the exact independently pasteable Bash steps; and return only the structured evidence ledger. Do not pass raw credentials, tokens, cookies, or opaque IDs to it. All mutations and cleanup must target only resources created for that verification run. The verifier must not edit code, issue/PR text, or delete an existing user-owned application. The main agent remains responsible for validating the ledger, recording limitations, cleanup of only the task-owned fixture, and tracker/PR updates. Do not write live acceptance into the task or PR until the verifier ledger has been returned and checked.
-
-If no isolated verifier facility exists, or the verifier lacks a safe documented account and task-owned fixture, run the check in the current context and record that exact limitation. A fresh context reduces context-interference risk; it does not make unrun or failed evidence pass.
 
 For the full command and reporting contract, read [manual-test-contract.md](references/manual-test-contract.md).
