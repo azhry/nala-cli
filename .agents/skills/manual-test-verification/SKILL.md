@@ -28,6 +28,17 @@ Before writing or updating manual evidence in a task or pull request:
 
 For live flows that cross services or mutate external state, use the independent-verifier protocol below. When an isolated subagent facility and a safe documented account/task-owned fixture are available, delegation is a required gate before reporting live acceptance; if either is unavailable, record the exact blocker.
 
+## Role-separated execution
+
+Use four explicit phases for high-risk live acceptance:
+
+1. **Main preparation:** read the task/PR, repository rules, knowledge, and manual contract; resolve the documented environment; create or identify a task-owned fixture; and prepare the exact commands. Do not publish observed results or completion state during this phase.
+2. **Fresh verifier execution:** spawn an isolated verifier with the task/PR reference and repository paths, but no raw credentials, cookies, tokens, or opaque IDs. The verifier independently reads the rules and skill, derives its own positive IDs from its task-owned fixture, runs the exact Bash blocks, and returns only the structured evidence ledger. All live mutations and cleanup must be limited to resources created for that verification run; it must not edit code, tracker/PR text, or existing user-owned applications.
+3. **Main validation:** verify that every required target has a ledger row containing the exact command, immediate status, sanitized response, expected outcome, classification, environment/fixture, and limitation. Reject missing rows, wrapper-only statuses, placeholders, non-terminal queued results, unrun steps, and unverified cleanup.
+4. **Publication:** only after the ledger passes validation may the main agent update Linear/GitHub, change review state, or claim completion. Preserve every fail and limitation; do not rewrite it as reviewer work.
+
+If no isolated verifier or safe task-owned fixture exists, record that exact blocker and use the same ledger in the current context. This phase gate applies regardless of model, context window, or reasoning setting: xhigh adds thinking budget but is not an execution or publication control.
+
 ## Audit-derived readiness checks
 
 When the task includes a tracker or pull-request readiness artifact, apply these safeguards before execution:
@@ -41,13 +52,14 @@ When the task includes a tracker or pull-request readiness artifact, apply these
 
 - Keep each Bash command independently pasteable and leave the terminal open after failures. A verification block must not bundle health, login, create, replay, and cleanup requests into one copy-paste. In the report, reproduce the exact command that ran and its immediate status; do not report a prose endpoint name or a whole-script summary as the command.
 - Never expose API keys, JWTs, cookies, Vault values, provider tokens, or other credentials in output or reports.
+- Keep fixture-derived opaque IDs process-local. Commands may use variables such as `APP_ID` and `DEPLOYMENT_ID`; do not print literal IDs or pass them in verifier prompts, ledgers, tracker text, or PR text. Record the symbolic variable and its derivation source instead.
 - Unit tests, local fixtures, stub servers, and protocol checks are regression evidence only; they do not prove live API or authentication behavior.
 - If the live boundary was not run, say so explicitly and name the unavailable dependency or required human action. Do not call an unrun live flow passed.
 - Preserve the repository's documented run commands and environment names. Do not silently substitute ports, accounts, providers, or fixtures.
 
 ## Independent verifier protocol
 
-For deploy, monitor, delete, or other destructive/cross-service acceptance, a fresh-context verifier is required when an isolated subagent facility and a safe documented account/task-owned fixture are available. It must read the current task/PR, `AGENTS.md`, the relevant knowledge, and this skill itself; run the exact independently pasteable Bash steps; and return only the structured evidence ledger. Do not pass raw credentials, tokens, cookies, or opaque IDs to it. The verifier must not edit code, issue/PR text, or delete an existing user-owned application. The main agent remains responsible for validating the ledger, recording limitations, authorized cleanup, and tracker/PR updates. Do not write live acceptance into the task or PR until the verifier ledger has been returned and checked.
+For deploy, monitor, delete, or other destructive/cross-service acceptance, a fresh-context verifier is required when an isolated subagent facility and a safe documented account/task-owned fixture are available. It must read the current task/PR, `AGENTS.md`, the relevant knowledge, and this skill itself; run the exact independently pasteable Bash steps; and return only the structured evidence ledger. Do not pass raw credentials, tokens, cookies, or opaque IDs to it. All mutations and cleanup must target only resources created for that verification run. The verifier must not edit code, issue/PR text, or delete an existing user-owned application. The main agent remains responsible for validating the ledger, recording limitations, cleanup of only the task-owned fixture, and tracker/PR updates. Do not write live acceptance into the task or PR until the verifier ledger has been returned and checked.
 
 If no isolated verifier facility exists, or the verifier lacks a safe documented account and task-owned fixture, run the check in the current context and record that exact limitation. A fresh context reduces context-interference risk; it does not make unrun or failed evidence pass.
 

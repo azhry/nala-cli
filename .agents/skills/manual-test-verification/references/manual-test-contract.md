@@ -47,13 +47,28 @@ Remove API keys, JWTs, cookies, passwords, Vault values, provider tokens, author
 
 Unit tests, mocks, fakes, stub servers, isolated protocol checks, and local fixtures can support regression claims only. They cannot prove live API, authentication, persistence, Vault, or cross-service behavior. If the live API or authentication boundary was not run, state that exact limitation and do not report the live flow as passed.
 
+Keep fixture-derived opaque IDs process-local. Use symbolic variables such as `APP_ID` and `DEPLOYMENT_ID` in runnable commands; do not print literal IDs or pass them in verifier prompts, evidence ledgers, tracker text, or PR text. Record the variable name and that it was derived from the real fixture response.
+
 ## Failure handling
 
 Preserve complete failure output in temporary or ignored storage when needed, but keep credentials out of it. Leave the terminal open after a failure so a human can inspect the state. Stop and report when a required dependency, credential, fixture, or documented environment is unavailable; do not silently downgrade a live check to a mock or change the port.
 
 ## Independent verifier
 
-For destructive or cross-service live acceptance, an isolated fresh-context verifier is required when the platform provides one and a safe documented account/task-owned fixture is available. The verifier must independently read the current task/PR and repository rules, use its own safe documented account and task-owned fixture, execute the exact Bash blocks, and return the report-template fields. Do not provide raw credentials or opaque IDs, and do not let it mutate code, tracker/PR text, or existing user-owned applications. The primary agent validates the returned ledger and performs authorized cleanup and handoff; it must not write live acceptance before that ledger is checked. If no isolated verifier or safe fixture is available, continue in the current context and record the exact blocker; delegation is not a substitute for evidence.
+For destructive or cross-service live acceptance, an isolated fresh-context verifier is required when the platform provides one and a safe documented account/task-owned fixture is available. The verifier must independently read the current task/PR and repository rules, use its own safe documented account and task-owned fixture, execute the exact Bash blocks, and return the report-template fields. Do not provide raw credentials or opaque IDs, and do not let it mutate code, tracker/PR text, or existing user-owned applications. All live mutations and cleanup must target only resources created for that verification run. The primary agent validates the returned ledger and performs cleanup only for that task-owned fixture; it must not write live acceptance before that ledger is checked. If no isolated verifier or safe fixture is available, continue in the current context and record the exact blocker; delegation is not a substitute for evidence.
+
+## Role-separated execution record
+
+Use this ownership boundary for high-risk live acceptance:
+
+| Phase | Owner | Allowed output/action | Required gate |
+| --- | --- | --- | --- |
+| Prepare | Main agent | Read contract/rules, resolve environment, prepare exact commands, and create or identify a task-owned fixture | No observed-result, completion, or ready-for-review mutation; all mutations remain task-owned |
+| Execute | Fresh isolated verifier | Run the exact Bash blocks and return only the structured ledger; derive positive IDs from its own fixture | No raw secrets/opaque IDs; mutations only against its task-owned fixture; no code or tracker/PR mutation |
+| Validate | Main agent | Check every ledger row, status, response, classification, limitation, and cleanup result | Missing, unrun, wrapper-only, queued-without-terminal, or failed evidence blocks acceptance |
+| Publish | Main agent | Update the task/PR and claim only the validated result | Verifier ledger returned and checked; failures and limitations preserved; no other resource mutation |
+
+The verifier ledger must contain one row per required target with: exact command, immediate target status, sanitized response, expected outcome, classification, environment/fixture, and limitation. For fixture-derived opaque IDs, the command record uses the symbolic variable (for example, `$APP_ID`) and identifies its derivation source without printing the literal value. A verifier's prose summary, a reviewer instruction, or a model's reasoning effort is not a ledger row or execution proof. Apply this gate regardless of model or reasoning setting.
 
 ## Audit-derived readiness matrix
 
