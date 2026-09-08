@@ -1,6 +1,7 @@
 # CLI authentication
 
-`nala login` uses the Nala Labs CLI authentication boundary:
+`nala login` establishes the shared authenticated session used by command
+groups that call Nala Labs and `nala-svc`:
 
 1. `GET /api/auth/cli/authorize` receives the CLI loopback `redirect_uri` and
    random `state`. Nala Labs validates the loopback target and returns `302`

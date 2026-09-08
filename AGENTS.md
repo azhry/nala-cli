@@ -90,6 +90,7 @@ For a request containing a Linear issue ID such as `AZH-385`:
 ## CLI boundary
 
 - Nala Labs owns Casdoor/provider exchange and session JWT issuance. The CLI consumes the one-time exchange result and session endpoint; it does not mint login tokens or own provider credentials.
+- The CLI is the unified client for Nala Labs and `nala-svc`. Reuse the Nala Labs-issued session JWT across documented service boundaries; `nala-svc` consumes it and does not mint a second login token.
 - Preserve the documented local session contract, restrictive file permissions, state validation, and token-free output. Never print, commit, or transmit session-file contents.
 - The Go module is at the repository root. Use the root-level commands in the backend workflow, not a sibling service's `backend/` path or Make targets.
 - Respect explicit user restrictions on browser use. If a required live login or visual verification cannot be performed under those restrictions, record it as not run and do not claim live acceptance.
