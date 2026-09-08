@@ -6,7 +6,7 @@
 - If using a worktree, clean up the task-owned worktree and its related caches and artifacts after delivery; preserve user-owned files and worktrees.
 - Before any task action, load only the immediately required allowlisted key from `.agents/config.md` through a non-printing loader. Never call a generic read tool on this file or render, print, commit, or transmit its contents.
 - Read the relevant files under `.agents/knowledge/` before making assumptions about runtime accounts, providers, roles, tiers, endpoints, or test fixtures. Keep secret values out of transcripts and handoff records.
-- Read [.agents/knowledge/index.md](.agents/knowledge/index.md) to know the project context. The shared setup baseline and intentional CLI differences are recorded in [agent setup](.agents/knowledge/agent-setup.md).
+- Read [.agents/knowledge/index.md](.agents/knowledge/index.md) to know the project context.
 - Use authenticated connectors or stored CLI credentials without loading optional project secrets. If an immediate operation needs a secret, follow the allowlisted loading rules; never copy another service's private config into this repository.
 - Config access must use a non-printing allowlisted loader. Never use `Get-Content`, `Select-String`, `rg`, `type`, or any generic reader on `.agents/config.md`, even when assigning the result to `$null`. Load only the single required `KEY=value` entry into the current process.
 - Make sure all the necessary tools and credentials work before taking task actions.

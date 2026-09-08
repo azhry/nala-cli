@@ -51,8 +51,7 @@ regression coverage; they do not prove live provider authentication.
 Start with [AGENTS.md](AGENTS.md), then the relevant
 [project knowledge](.agents/knowledge/index.md). Shared workflows, issue/PR
 templates, and bundled skills follow the other Nala services; the
-[agent setup notes](.agents/knowledge/agent-setup.md) record the baseline and
-CLI-specific adaptations. Read the knowledge before changing the authentication boundary. Nala Labs
+Read the knowledge before changing the authentication boundary. Nala Labs
 owns provider exchange and session JWT issuance; this CLI only receives the
 one-time exchange result, stores the session locally, and consumes the session
 endpoint.

@@ -6,4 +6,3 @@ This directory is the agent-facing source of truth for the CLI boundary.
 - [Architecture](architecture.md) — command and package responsibilities.
 - [Authentication](authentication.md) — browser login and local session flow.
 - [Nala Labs API](nala-labs-api.md) — consumed endpoint contract.
-- [Agent setup](agent-setup.md) — shared service baseline, CLI adaptations, and maintenance.
