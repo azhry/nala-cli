@@ -6,6 +6,7 @@ repository at `.agents/knowledge/api-contracts.md`. The CLI consumes:
 | Method | Endpoint | Purpose |
 | --- | --- | --- |
 | `GET` | `/api/auth/cli/authorize` | Validate loopback callback and start browser login. |
+| `POST` | `/api/auth/cli/complete` | Complete the first-party Nala Labs browser login for a CLI state. |
 | `GET` | `/api/auth/callback` | Provider callback; returns to the CLI transaction when applicable. |
 | `POST` | `/api/auth/cli/exchange` | Consume a one-time CLI code and return a session. |
 | `GET` | `/api/auth/session` | Resolve the stored bearer session and current user. |

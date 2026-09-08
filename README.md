@@ -17,12 +17,12 @@ nala app monitor --deployment-id N [--cursor N --follow]
 nala app delete --id N
 ```
 
-`nala login` starts a short-lived loopback callback server, opens the Nala Labs
-login page, validates the returned state, exchanges the one-time callback code,
-and stores the Nala Labs session locally. It confirms the signed-in user
-without printing the session token. `nala user info` reads that local session
-and calls the Nala Labs session endpoint, printing the authenticated user and
-entitlements.
+`nala login` starts a short-lived loopback callback server, opens the first-party
+Nala Labs `/login` page in the browser, validates the returned state, exchanges
+the one-time callback code, and stores the Nala Labs session locally. It confirms the
+signed-in user without printing the session token. `nala user info` reads that
+local session and calls the Nala Labs session endpoint, printing the
+authenticated user and entitlements.
 
 The `app` commands use the same stored Nala Labs session bearer. Listing,
 details, and deletion call Nala Labs; deployment creation, snapshots, and
