@@ -2,6 +2,10 @@
 
 This reference defines the evidence required when a task or pull request asks for manual verification.
 
+## Minimality and correction
+
+Use the shortest workflow that satisfies this contract. A user correction that removes an optional step or explanation takes precedence over the agent's prior plan; delete the rejected process instead of defending or renaming it. Keep only constraints required by this contract or an explicit safety rule.
+
 ## Before execution
 
 - Treat the issue or PR's manual steps as the contract. Preserve its command text and expected result unless the task explicitly changes them.

@@ -7,6 +7,10 @@ description: Execute task and pull-request manual verification as context-first,
 
 Use this skill to produce reviewable evidence for manual test steps without overstating what local fixtures or wrappers prove.
 
+## Minimality and correction
+
+Keep the verification workflow to the minimum required by the task and safety contract. If the user says a step, phase, section, or explanation is unnecessary, remove it; do not defend it, rename it, or preserve it as equivalent process. Retain an extra constraint only when the contract or a specific safety rule requires it, and identify that dependency briefly.
+
 ## Quick start
 
 1. Read the task or pull-request manual steps, `AGENTS.md`, and the relevant `.agents/knowledge/` files before choosing commands or assumptions.
