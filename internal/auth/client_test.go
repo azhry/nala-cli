@@ -130,3 +130,43 @@ func TestUserInfoWithoutSessionDoesNotMakeRequest(t *testing.T) {
 		t.Fatal("UserInfo() made a request without a stored session")
 	}
 }
+
+func TestNewClientFromEnvironmentUsesSavedAPIURL(t *testing.T) {
+	t.Setenv("NALA_CONFIG_DIR", t.TempDir())
+	t.Setenv("NALA_API_BASE_URL", "")
+	store, err := config.NewSettingsStore()
+	if err != nil {
+		t.Fatal(err)
+	}
+	if err := store.Save(config.Settings{APIBaseURL: "http://127.0.0.1:8082"}); err != nil {
+		t.Fatal(err)
+	}
+
+	client, err := NewClientFromEnvironment()
+	if err != nil {
+		t.Fatalf("NewClientFromEnvironment() error = %v", err)
+	}
+	if client.BaseURL != "http://127.0.0.1:8082" {
+		t.Fatalf("BaseURL = %q, want saved API URL", client.BaseURL)
+	}
+}
+
+func TestNewClientFromEnvironmentPrefersAPIEnvironmentOverride(t *testing.T) {
+	t.Setenv("NALA_CONFIG_DIR", t.TempDir())
+	t.Setenv("NALA_API_BASE_URL", "http://127.0.0.1:9090")
+	store, err := config.NewSettingsStore()
+	if err != nil {
+		t.Fatal(err)
+	}
+	if err := store.Save(config.Settings{APIBaseURL: "http://127.0.0.1:8082"}); err != nil {
+		t.Fatal(err)
+	}
+
+	client, err := NewClientFromEnvironment()
+	if err != nil {
+		t.Fatalf("NewClientFromEnvironment() error = %v", err)
+	}
+	if client.BaseURL != "http://127.0.0.1:9090" {
+		t.Fatalf("BaseURL = %q, want environment override", client.BaseURL)
+	}
+}
