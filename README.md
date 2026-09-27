@@ -38,10 +38,11 @@ by default and newline-delimited event JSON when `--follow` is supplied.
 - A Nala Labs account for live login verification
 
 The CLI stores non-secret service endpoints in `config.json` beside the local
-session file. Configure a local environment once with:
+session file. The documented local defaults work without configuration. To
+persist those defaults explicitly, or to replace them for another environment:
 
 ```bash
-nala config set --api-url 'http://127.0.0.1:8082' --svc-url 'http://127.0.0.1:8083'
+nala config set --api-url 'http://127.0.0.1:8080' --svc-url 'http://127.0.0.1:8081'
 nala config show
 ```
 
