@@ -109,6 +109,27 @@ func TestClientOperationsUseSharedSessionAndServiceBoundaries(t *testing.T) {
 	}
 }
 
+func TestNewClientFromEnvironmentUsesSavedServiceURLs(t *testing.T) {
+	t.Setenv("NALA_CONFIG_DIR", t.TempDir())
+	t.Setenv("NALA_API_BASE_URL", "")
+	t.Setenv("NALA_SVC_BASE_URL", "")
+	store, err := config.NewSettingsStore()
+	if err != nil {
+		t.Fatal(err)
+	}
+	if err := store.Save(config.Settings{APIBaseURL: "http://127.0.0.1:8082", SVCBaseURL: "http://127.0.0.1:8083"}); err != nil {
+		t.Fatal(err)
+	}
+
+	client, err := NewClientFromEnvironment()
+	if err != nil {
+		t.Fatalf("NewClientFromEnvironment() error = %v", err)
+	}
+	if client.NalaLabsBaseURL != "http://127.0.0.1:8082" || client.NalaSVCBaseURL != "http://127.0.0.1:8083" {
+		t.Fatalf("client URLs = %q, %q", client.NalaLabsBaseURL, client.NalaSVCBaseURL)
+	}
+}
+
 func TestFollowDeploymentEventsParsesSSEAndIgnoresKeepAlive(t *testing.T) {
 	store := &config.SessionStore{Path: filepath.Join(t.TempDir(), "session.json")}
 	if err := store.Save("shared-session-token"); err != nil {

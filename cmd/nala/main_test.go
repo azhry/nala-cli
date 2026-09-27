@@ -148,6 +148,32 @@ func TestRunAppRejectsInvalidIDBeforeRequest(t *testing.T) {
 	}
 }
 
+func TestRunConfigSetAndShow(t *testing.T) {
+	t.Setenv("NALA_CONFIG_DIR", t.TempDir())
+	t.Setenv("NALA_API_BASE_URL", "")
+	t.Setenv("NALA_SVC_BASE_URL", "")
+
+	var stdout, stderr bytes.Buffer
+	if err := run([]string{"config", "set", "--api-url", "http://127.0.0.1:8082", "--svc-url", "http://127.0.0.1:8083"}, &stdout, &stderr); err != nil {
+		t.Fatalf("config set error = %v; stderr = %s", err, stderr.String())
+	}
+	if got := stdout.String(); got != "Saved Nala CLI endpoint configuration.\n" {
+		t.Fatalf("config set stdout = %q", got)
+	}
+
+	stdout.Reset()
+	if err := run([]string{"config", "show"}, &stdout, &stderr); err != nil {
+		t.Fatalf("config show error = %v; stderr = %s", err, stderr.String())
+	}
+	var settings config.Settings
+	if err := json.Unmarshal(stdout.Bytes(), &settings); err != nil {
+		t.Fatalf("decode config show: %v", err)
+	}
+	if settings.APIBaseURL != "http://127.0.0.1:8082" || settings.SVCBaseURL != "http://127.0.0.1:8083" {
+		t.Fatalf("config show = %+v", settings)
+	}
+}
+
 func newCLIService(t *testing.T, handler http.HandlerFunc) *httptest.Server {
 	t.Helper()
 	server := httptest.NewServer(handler)

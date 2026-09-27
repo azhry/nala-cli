@@ -10,6 +10,8 @@ authenticated app/deployment lifecycle:
 ```text
 nala login
 nala user info
+nala config show
+nala config set --api-url URL --svc-url URL
 nala app list [--page N --page-size N]
 nala app get --id N
 nala app deploy --id N --source-ref REF --idempotency-key KEY
@@ -35,26 +37,27 @@ by default and newline-delimited event JSON when `--follow` is supplied.
 - Nala Labs and `nala-svc` environments for the command groups being used
 - A Nala Labs account for live login verification
 
-The current authentication and session client uses the Nala Labs API base URL,
-which defaults to `http://127.0.0.1:8080`. Override it with
-`NALA_API_BASE_URL`:
+The CLI stores non-secret service endpoints in `config.json` beside the local
+session file. Configure a local environment once with:
 
 ```bash
-export NALA_API_BASE_URL='http://127.0.0.1:8080'
+nala config set --api-url 'http://127.0.0.1:8082' --svc-url 'http://127.0.0.1:8083'
+nala config show
 ```
 
-The `nala-svc` base URL defaults to `http://127.0.0.1:8081`. Override it with
-`NALA_SVC_BASE_URL` when using a different service environment:
+The defaults are `http://127.0.0.1:8080` for Nala Labs and
+`http://127.0.0.1:8081` for `nala-svc`. `NALA_API_BASE_URL` and
+`NALA_SVC_BASE_URL` remain supported as process-local overrides for CI and
+one-off checks, and take precedence over the config file.
 
-```bash
-export NALA_SVC_BASE_URL='http://127.0.0.1:8081'
-```
+`NALA_FRONTEND_URL` is not a CLI setting and is not read by `nala`. The Nala
+Labs backend uses its own `FRONTEND_URL` process setting when it starts.
 
-Session data is stored at the platform user-config directory under
-`nala/session.json` with restrictive local permissions. Set
-`NALA_CONFIG_DIR` to override the parent directory during development or
-testing. Do not commit that file or copy its contents into logs, tickets, or
-pull requests.
+Configuration and session data are stored at the platform user-config
+directory under `nala/config.json` and `nala/session.json` with restrictive
+local permissions. Set `NALA_CONFIG_DIR` to override the parent directory
+during development or testing. Do not commit those files or copy session
+contents into logs, tickets, or pull requests.
 
 ## Development
 

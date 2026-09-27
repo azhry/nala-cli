@@ -8,8 +8,10 @@ import (
 	"fmt"
 	"io"
 	"os"
+	"strings"
 
 	"github.com/azhry/nala-cli/internal/auth"
+	"github.com/azhry/nala-cli/internal/config"
 	"github.com/azhry/nala-cli/internal/platform"
 )
 
@@ -26,6 +28,8 @@ func run(args []string, stdout, stderr io.Writer) error {
 		return nil
 	}
 	switch {
+	case args[0] == "config":
+		return runConfig(args[1:], stdout, stderr)
 	case len(args) == 1 && args[0] == "login":
 		client, err := auth.NewClientFromEnvironment()
 		if err != nil {
@@ -63,7 +67,60 @@ func run(args []string, stdout, stderr io.Writer) error {
 }
 
 func writeUsage(writer io.Writer) {
-	_, _ = io.WriteString(writer, "Usage:\n  nala login\n  nala user info\n  nala app list [--page N --page-size N]\n  nala app get --id N\n  nala app deploy --id N --source-ref REF --idempotency-key KEY\n  nala app monitor --deployment-id N [--cursor N --follow]\n  nala app delete --id N\n")
+	_, _ = io.WriteString(writer, "Usage:\n  nala login\n  nala user info\n  nala config show\n  nala config set [--api-url URL] [--svc-url URL]\n  nala app list [--page N --page-size N]\n  nala app get --id N\n  nala app deploy --id N --source-ref REF --idempotency-key KEY\n  nala app monitor --deployment-id N [--cursor N --follow]\n  nala app delete --id N\n")
+}
+
+func runConfig(args []string, stdout, stderr io.Writer) error {
+	if len(args) == 0 || (len(args) == 1 && (args[0] == "--help" || args[0] == "-h")) {
+		_, _ = io.WriteString(stdout, "Usage:\n  nala config show\n  nala config set [--api-url URL] [--svc-url URL]\n")
+		return nil
+	}
+	store, err := config.NewSettingsStore()
+	if err != nil {
+		return err
+	}
+	switch args[0] {
+	case "show":
+		if len(args) != 1 {
+			return errors.New("config show does not accept arguments")
+		}
+		settings, err := store.Load()
+		if err != nil {
+			return err
+		}
+		return json.NewEncoder(stdout).Encode(settings)
+	case "set":
+		flags := flag.NewFlagSet("nala config set", flag.ContinueOnError)
+		flags.SetOutput(stderr)
+		apiURL := flags.String("api-url", "", "Nala Labs API base URL")
+		svcURL := flags.String("svc-url", "", "nala-svc base URL")
+		if err := flags.Parse(args[1:]); err != nil {
+			return err
+		}
+		if flags.NArg() > 0 {
+			return fmt.Errorf("unexpected argument %q", flags.Arg(0))
+		}
+		if strings.TrimSpace(*apiURL) == "" && strings.TrimSpace(*svcURL) == "" {
+			return errors.New("config set requires --api-url or --svc-url")
+		}
+		settings, err := store.Load()
+		if err != nil {
+			return err
+		}
+		if strings.TrimSpace(*apiURL) != "" {
+			settings.APIBaseURL = *apiURL
+		}
+		if strings.TrimSpace(*svcURL) != "" {
+			settings.SVCBaseURL = *svcURL
+		}
+		if err := store.Save(settings); err != nil {
+			return err
+		}
+		_, _ = io.WriteString(stdout, "Saved Nala CLI endpoint configuration.\n")
+		return nil
+	default:
+		return fmt.Errorf("unknown config command %q", args[0])
+	}
 }
 
 func runApp(args []string, stdout, stderr io.Writer) error {

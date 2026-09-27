@@ -177,13 +177,29 @@ func NewClient(nalaLabsBaseURL, nalaSVCBaseURL string, store *config.SessionStor
 }
 
 func NewClientFromEnvironment() (*Client, error) {
+	settingsStore, err := config.NewSettingsStore()
+	if err != nil {
+		return nil, err
+	}
+	settings, err := settingsStore.Load()
+	if err != nil {
+		return nil, err
+	}
 	store, err := config.NewSessionStore()
 	if err != nil {
 		return nil, err
 	}
+	apiBaseURL := getenv("NALA_API_BASE_URL", settings.APIBaseURL)
+	if strings.TrimSpace(apiBaseURL) == "" {
+		apiBaseURL = defaultNalaLabsURL
+	}
+	svcBaseURL := getenv("NALA_SVC_BASE_URL", settings.SVCBaseURL)
+	if strings.TrimSpace(svcBaseURL) == "" {
+		svcBaseURL = defaultNalaSVCURL
+	}
 	return NewClient(
-		getenv("NALA_API_BASE_URL", defaultNalaLabsURL),
-		getenv("NALA_SVC_BASE_URL", defaultNalaSVCURL),
+		apiBaseURL,
+		svcBaseURL,
 		store,
 	), nil
 }
