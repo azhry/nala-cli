@@ -7,3 +7,6 @@ session.json
 .agents/.env
 __pycache__/
 *.py[cod]
+
+# Application logs
+logs/

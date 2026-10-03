@@ -94,3 +94,7 @@ For a request containing a Linear issue ID such as `AZH-385`:
 - Preserve the documented local session contract, restrictive file permissions, state validation, and token-free output. Never print, commit, or transmit session-file contents.
 - The Go module is at the repository root. Use the root-level commands in the backend workflow, not a sibling service's `backend/` path or Make targets.
 - Respect explicit user restrictions on browser use. If a required live login or visual verification cannot be performed under those restrictions, record it as not run and do not claim live acceptance.
+
+## Log diagnostics
+
+When diagnosing nala CLI failures, inspect the current application log and rotated backups described in [logging knowledge](.agents/knowledge/logging.md). Check the OS user config directory, NALA_CONFIG_DIR, and NALA_LOG_FILE if the default file is missing. Do not add tokens, authorization headers, command arguments, or request bodies to logs.
