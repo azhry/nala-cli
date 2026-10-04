@@ -73,7 +73,18 @@ func NewClient(baseURL string, store *config.SessionStore) *Client {
 }
 
 func NewClientFromEnvironment() (*Client, error) {
-	baseURL := strings.TrimSpace(getenv("NALA_API_BASE_URL", "http://127.0.0.1:8080"))
+	settingsStore, err := config.NewSettingsStore()
+	if err != nil {
+		return nil, err
+	}
+	settings, err := settingsStore.Load()
+	if err != nil {
+		return nil, err
+	}
+	baseURL := strings.TrimSpace(getenv("NALA_API_BASE_URL", settings.APIBaseURL))
+	if baseURL == "" {
+		baseURL = "http://127.0.0.1:8080"
+	}
 	store, err := config.NewSessionStore()
 	if err != nil {
 		return nil, err
