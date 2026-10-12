@@ -17,16 +17,23 @@ type sessionFile struct {
 }
 
 func NewSessionStore() (*SessionStore, error) {
-	root := strings.TrimSpace(os.Getenv("NALA_CONFIG_DIR"))
-	if root == "" {
-		var err error
-		root, err = os.UserConfigDir()
-		if err != nil {
-			return nil, err
-		}
-		root = filepath.Join(root, "nala")
+	root, err := Root()
+	if err != nil {
+		return nil, err
 	}
 	return &SessionStore{Path: filepath.Join(root, "session.json")}, nil
+}
+
+func Root() (string, error) {
+	root := strings.TrimSpace(os.Getenv("NALA_CONFIG_DIR"))
+	if root != "" {
+		return root, nil
+	}
+	root, err := os.UserConfigDir()
+	if err != nil {
+		return "", err
+	}
+	return filepath.Join(root, "nala"), nil
 }
 
 func (s *SessionStore) Save(token string) error {

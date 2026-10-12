@@ -2,16 +2,22 @@
 
 This reference defines the evidence required when a task or pull request asks for manual verification.
 
+## Minimality and correction
+
+Use the shortest workflow that satisfies this contract. A user correction that removes an optional step or explanation takes precedence over the agent's prior plan; delete the rejected process instead of defending or renaming it. Keep only constraints required by this contract or an explicit safety rule.
+
 ## Before execution
 
 - Treat the issue or PR's manual steps as the contract. Preserve its command text and expected result unless the task explicitly changes them.
 - Read `AGENTS.md`, the relevant `.agents/knowledge/` files, and any service-specific run instructions. Resolve the actual repository root, environment name, URL, and port from those sources or the running process.
 - Use documented accounts, providers, roles, tiers, endpoints, and fixtures. Do not invent a record or substitute a local fake for a live acceptance boundary.
 - If a command needs `.agents/.env`, load only the allowlisted key required for that command into the current process with a non-printing lookup. Never dot-source/source the file, load it wholesale, print the file, echo values, or place a secret in a command, report, commit, or handoff.
+- Run each live target before writing its observed result into the issue or PR. Never use `id 0`, `example.invalid`, an invented app name, or a hard-coded positive ID in the positive acceptance flow; derive positive IDs from the real fixture response. A reviewer instruction is a handoff condition, not evidence that the current agent ran the step. Keep any negative input-validation check clearly regression-only and separate from live acceptance.
+- Do not update verification-related tracker/PR state—including pass, acceptance, completion, or ready-for-review markers—until every required target has an evidence-ledger entry and, when required, the fresh-context verifier ledger has been returned and checked. Before then, record only an explicit blocker or limitation; never mark unrun work passed.
 
 ## Bash execution
 
-Use Bash only for this contract. Keep setup separate from verification and make each numbered verification step one independently pasteable fenced Bash block containing one target request, normally one simple `curl`, plus its immediate status capture. Do not put health, login, fixture creation, the behavior under test, assertions, or cleanup into one block. Do not use `set -e`, `set -Eeuo pipefail`, `set -o pipefail`, a trap that exits early, a helper script, a full-flow script, a loop, a function, or a bulk runner that can hide which command failed. Never hand off an endpoint label such as `POST /api/apps` in place of the runnable command.
+Use Bash only for this contract. Keep setup separate from verification and make each numbered verification step one independently pasteable fenced Bash block containing one target request, normally one simple `curl`, plus its immediate status capture. Do not put health, login, fixture creation, the behavior under test, assertions, or cleanup into one block. Do not use `set -e`, `set -Eeuo pipefail`, `set -o pipefail`, a trap that exits early, a helper script, a full-flow script, a loop, a function, a bulk runner, or a timeout wrapper that can hide which command failed. For a long-running follow, run the bare target in an interactive Bash shell; if a human interrupts it, capture that target's status immediately and classify it as fail/limitation unless the documented terminal contract was reached. Never hand off an endpoint label such as `POST /api/apps` in place of the runnable command.
 
 For each target command, capture its immediate status before any assertion, formatter, cleanup, or follow-up command:
 
@@ -45,9 +51,15 @@ Remove API keys, JWTs, cookies, passwords, Vault values, provider tokens, author
 
 Unit tests, mocks, fakes, stub servers, isolated protocol checks, and local fixtures can support regression claims only. They cannot prove live API, authentication, persistence, Vault, or cross-service behavior. If the live API or authentication boundary was not run, state that exact limitation and do not report the live flow as passed.
 
+Keep fixture-derived opaque IDs process-local. Use symbolic variables such as `APP_ID` and `DEPLOYMENT_ID` in runnable commands; do not print literal IDs or pass them in verifier prompts, evidence ledgers, tracker text, or PR text. Record the variable name and that it was derived from the real fixture response.
+
 ## Failure handling
 
 Preserve complete failure output in temporary or ignored storage when needed, but keep credentials out of it. Leave the terminal open after a failure so a human can inspect the state. Stop and report when a required dependency, credential, fixture, or documented environment is unavailable; do not silently downgrade a live check to a mock or change the port.
+
+## Independent verifier
+
+For destructive or cross-service live acceptance, the main agent must spawn one fresh-context verifier and wait for its report when the platform provides an isolated facility and a safe documented account/task-owned fixture. The verifier independently reads the current task/PR, repository rules, knowledge, and this contract; runs the exact Bash blocks; and returns the required fields for each target. Do not provide raw credentials, cookies, tokens, or opaque IDs. All live mutations and cleanup must target only resources created for that run; the verifier cannot edit code, tracker/PR text, or existing user-owned applications. For fixture-derived IDs, use symbolic variables such as `$APP_ID` or `$DEPLOYMENT_ID` and identify their derivation source without printing literal values. If no isolated verifier or safe fixture is available, record the exact blocker and use the same contract in the current context. A verifier's prose summary, reviewer instruction, or xhigh reasoning effort is not execution proof.
 
 ## Audit-derived readiness matrix
 
