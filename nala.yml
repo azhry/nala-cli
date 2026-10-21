@@ -1,0 +1,4 @@
+projects:
+  cli:
+    cwd: .
+    run: go run ./cmd/nala --help
