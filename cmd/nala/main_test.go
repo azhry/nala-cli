@@ -201,7 +201,7 @@ func TestRunWithLoggingPreservesHelpOutput(t *testing.T) {
 	if err := runWithLogging([]string{"--help"}, &stdout, &stderr); err != nil {
 		t.Fatalf("run help: %v", err)
 	}
-	want := "Usage:\n  nala login\n  nala user info\n" +
+	want := "Usage:\n  nala login [--device-code]\n  nala user info\n" +
 		"  nala config show\n  nala config set [--api-url URL] [--svc-url URL]\n" +
 		"  nala app list [--page N --page-size N]\n  nala app get --id N\n" +
 		"  nala app deploy --id N --source-ref REF --idempotency-key KEY\n" +
@@ -218,6 +218,25 @@ func TestRunWithLoggingPreservesHelpOutput(t *testing.T) {
 	}
 	if !bytes.Contains(log, []byte("command completed")) || !bytes.Contains(log, []byte("help")) {
 		t.Fatalf("log does not describe help completion: %s", log)
+	}
+}
+
+func TestRunLoginHelpAndRejectsUnsupportedOptions(t *testing.T) {
+	var stdout, stderr bytes.Buffer
+	if err := run([]string{"login", "--help"}, &stdout, &stderr); err != nil {
+		t.Fatalf("login help error = %v", err)
+	}
+	if stdout.String() != "Usage: nala login [--device-code]\n" || stderr.Len() != 0 {
+		t.Fatalf("login help output = %q / %q", stdout.String(), stderr.String())
+	}
+
+	stdout.Reset()
+	stderr.Reset()
+	if err := run([]string{"login", "--unexpected"}, &stdout, &stderr); err == nil {
+		t.Fatal("unsupported login option should fail")
+	}
+	if stderr.String() != "Usage: nala login [--device-code]\n" {
+		t.Fatalf("invalid login output = %q", stderr.String())
 	}
 }
 
@@ -265,6 +284,8 @@ func TestSafeCommandNameIncludesConfigAndAppSubcommands(t *testing.T) {
 		args []string
 		want string
 	}{
+		{args: []string{"login", "--device-code"}, want: "login"},
+		{args: []string{"login", "--help"}, want: "login"},
 		{args: []string{"config", "set", "--api-url", "https://private.example"}, want: "config set"},
 		{args: []string{"app", "deploy", "--id", "7", "--idempotency-key", "private-value"}, want: "app deploy"},
 		{args: []string{"app", "unknown", "private-value"}, want: "unknown"},

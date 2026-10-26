@@ -63,6 +63,8 @@ func safeCommandName(args []string) string {
 	switch {
 	case len(args) == 1 && args[0] == "login":
 		return "login"
+	case len(args) == 2 && args[0] == "login" && (args[1] == "--device-code" || args[1] == "--help" || args[1] == "-h"):
+		return "login"
 	case len(args) == 2 && args[0] == "user" && args[1] == "info":
 		return "user info"
 	case len(args) >= 2 && args[0] == "config" && (args[1] == "show" || args[1] == "set"):
@@ -84,21 +86,8 @@ func run(args []string, stdout, stderr io.Writer) error {
 	switch {
 	case args[0] == "config":
 		return runConfig(args[1:], stdout, stderr)
-	case len(args) == 1 && args[0] == "login":
-		client, err := auth.NewClientFromEnvironment()
-		if err != nil {
-			return err
-		}
-		user, err := client.Login(context.Background())
-		if err != nil {
-			return err
-		}
-		name := user.Name
-		if name == "" {
-			name = user.ID
-		}
-		fmt.Fprintf(stdout, "Logged in as %s\n", name)
-		return nil
+	case args[0] == "login":
+		return runLogin(args[1:], stdout, stderr)
 	case len(args) == 2 && args[0] == "user" && args[1] == "info":
 		client, err := auth.NewClientFromEnvironment()
 		if err != nil {
@@ -121,7 +110,38 @@ func run(args []string, stdout, stderr io.Writer) error {
 }
 
 func writeUsage(writer io.Writer) {
-	_, _ = io.WriteString(writer, "Usage:\n  nala login\n  nala user info\n  nala config show\n  nala config set [--api-url URL] [--svc-url URL]\n  nala app list [--page N --page-size N]\n  nala app get --id N\n  nala app deploy --id N --source-ref REF --idempotency-key KEY\n  nala app monitor --deployment-id N [--cursor N --follow]\n  nala app delete --id N\n")
+	_, _ = io.WriteString(writer, "Usage:\n  nala login [--device-code]\n  nala user info\n  nala config show\n  nala config set [--api-url URL] [--svc-url URL]\n  nala app list [--page N --page-size N]\n  nala app get --id N\n  nala app deploy --id N --source-ref REF --idempotency-key KEY\n  nala app monitor --deployment-id N [--cursor N --follow]\n  nala app delete --id N\n")
+}
+
+func runLogin(args []string, stdout, stderr io.Writer) error {
+	if len(args) == 1 && (args[0] == "--help" || args[0] == "-h") {
+		_, _ = io.WriteString(stdout, "Usage: nala login [--device-code]\n")
+		return nil
+	}
+	if len(args) > 1 || len(args) == 1 && args[0] != "--device-code" {
+		_, _ = io.WriteString(stderr, "Usage: nala login [--device-code]\n")
+		return errors.New("invalid login option")
+	}
+
+	client, err := auth.NewClientFromEnvironment()
+	if err != nil {
+		return err
+	}
+	var user auth.User
+	if len(args) == 1 {
+		user, err = client.LoginDeviceCode(context.Background(), stdout)
+	} else {
+		user, err = client.Login(context.Background())
+	}
+	if err != nil {
+		return err
+	}
+	name := user.Name
+	if name == "" {
+		name = user.ID
+	}
+	fmt.Fprintf(stdout, "Logged in as %s\n", name)
+	return nil
 }
 
 func runConfig(args []string, stdout, stderr io.Writer) error {

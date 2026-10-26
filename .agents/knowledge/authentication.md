@@ -23,3 +23,12 @@ server shuts down after the login attempt.
 Live browser verification requires a running Nala Labs backend, its first-party
 login page, and a real test account. Local unit tests do not replace that
 boundary check.
+
+`nala login --device-code` is an opt-in headless alternative; `nala login`
+continues to use the loopback browser flow. Device login requests a public
+`nala-cli` grant, prints only the first-party verification URI and user code,
+and polls the device-token endpoint without opening a browser. The client
+waits for the server interval, adds five seconds after `slow_down`, and stops
+on denial or expiry. Before saving the returned JWT, it validates that token
+through `GET /api/auth/session`. The same restrictive local session file is
+used by both login modes.
