@@ -59,6 +59,7 @@ type Client struct {
 	Store        *config.SessionStore
 	OpenBrowser  func(string) error
 	Listen       func(network, address string) (net.Listener, error)
+	Wait         func(context.Context, time.Duration) error
 	LoginTimeout time.Duration
 }
 
@@ -169,6 +170,16 @@ func (c *Client) UserInfo(ctx context.Context) (User, error) {
 	token, err := c.Store.Token()
 	if err != nil {
 		return User{}, errors.New("not authenticated")
+	}
+	return c.userInfoWithToken(ctx, token)
+}
+
+func (c *Client) userInfoWithToken(ctx context.Context, token string) (User, error) {
+	if c == nil || strings.TrimSpace(token) == "" {
+		return User{}, errors.New("not authenticated")
+	}
+	if ctx == nil {
+		ctx = context.Background()
 	}
 	endpoint, err := c.endpoint("/api/auth/session")
 	if err != nil {

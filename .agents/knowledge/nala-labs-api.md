@@ -9,6 +9,9 @@ repository at `.agents/knowledge/api-contracts.md`. The CLI consumes:
 | `POST` | `/api/auth/cli/complete` | Complete the first-party Nala Labs browser login for a CLI state. |
 | `GET` | `/api/auth/callback` | Provider callback; returns to the CLI transaction when applicable. |
 | `POST` | `/api/auth/cli/exchange` | Consume a one-time CLI code and return a session. |
+| `POST` | `/api/auth/cli/device/code` | Request a device code and user code for headless CLI login. |
+| `POST` | `/api/auth/cli/device/approve` | First-party authenticated approval or denial of a user code. |
+| `POST` | `/api/auth/cli/device/token` | Poll or consume the RFC 8628 device grant. |
 | `GET` | `/api/auth/session` | Resolve the stored bearer session and current user. |
 
 This document covers the current authentication and session foundation, not
